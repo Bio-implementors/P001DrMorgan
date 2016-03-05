@@ -10,15 +10,18 @@ WORKdir <- ("~/P001DrMorgan") # REPLACE with your work directory path
 GSEname <- "GSE54539" # REPLACE with the GSE number of the data set to download from GEO (no spaces in name!)
 GLdir <- "LabNotebooks/GeneListsYeast" # REPLACE with your gene list directory path
 GLfile <- "Saccharomyces cerevisiae-KEGG_Pathway_Windows.gmt" # REPLACE with your gene list file name
-# Load previously calculated romerResults from query profile; e.g., see RNAseq_workflow_PsAvh172.R
+
+##
+## Load previously calculated romerResults from query profile; e.g., see RNAseq_workflow_PsAvh172.R
+## 
 r.Query <- read.delim("RScripts/r2.PsAvh172",header = TRUE, stringsAsFactors = FALSE) # romer output using default nrot
 
 ################################################################
 library(Biobase)
 library(GEOquery)
-library("limma", lib.loc="/Library/Frameworks/R.framework/Versions/3.2/Resources/library")
-library("GSEABase", lib.loc="/Library/Frameworks/R.framework/Versions/3.2/Resources/library")
-library("pheatmap", lib.loc="/Library/Frameworks/R.framework/Versions/3.2/Resources/library")
+library(limma)
+library(GSEABase)
+library(pheatmap)
 ################################################################
 
 # Create and move to a new folder for output files
@@ -26,22 +29,35 @@ WD <- file.path(WORKdir, GSEname) # New folder name
 dir.create(WD) # Create folder
 setwd(WD)
 
-# Download desired data set from GEO
+################################################################
+## Download desired data set from GEO
+################################################################
 gse <- getGEO(GSEname, GSEMatrix =TRUE) # This produces a "Large list" with the desired ExpressionSet as the last element
-# load series and platform data from GEO
+
+################################################################
+## load series and platform data from GEO
+################################################################
 ESet <- gse[[1]]
 ex <- exprs(gse[[1]]) # Extract matrix of M values
 cat(paste(GSEname, "data matrix initially has", dim(ex)[1], "probes and", dim(ex)[2], "samples. "))
-# convert missing data values (NA) to 0
+
+## convert missing data values (NA) to 0
 if (anyNA(ex)) {
   ex[which(is.na(ex))] <- 0
-} 
-# log2 transform expression values, if not already
-qx <- as.numeric(quantile(ex, c(0., 0.25, 0.5, 0.75, 0.99, 1.0), na.rm=T)) # examines distribution of values
+}
+
+################################################################
+## log2 transform expression values, if not already
+################################################################
+
+## examines distribution of values
+qx <- as.numeric(quantile(ex, c(0., 0.25, 0.5, 0.75, 0.99, 1.0), na.rm=T))
 LogC <- (qx[5] > 100) ||
   (qx[6]-qx[1] > 50 && qx[2] > 0) ||
-  (qx[2] > 0 && qx[2] < 1 && qx[4] > 1 && qx[4] < 2) 
-# if LogC TRUE (not yet transformed), then take log2 of each positive value and replace original matrix in the ExpressionSet
+  (qx[2] > 0 && qx[2] < 1 && qx[4] > 1 && qx[4] < 2) # <---- WHAT IS THIS!!??
+
+## if LogC TRUE (not yet transformed), then take log2 of each positive
+## value and replace original matrix in the ExpressionSet
 if (LogC) { ex[which(ex <= 0)] <- NaN
   exprs(gse) <- log2(ex) 
 } 
