@@ -78,8 +78,10 @@ head(levels(phenoData(ESet)$title))
 ####################################################################################
 # extract information about features from ESet
 ####################################################################################
-features <- featureData(ESet) # Put featureData in its own annotated dataframe
-# head(varMetadata(features)) # Gives structure of featureData
+# Put featureData in its own annotated dataframe
+features <- featureData(ESet) 
+# Gives structure of featureData
+# head(varMetadata(features)) 
 # head(features$ID) # ID of the features
 # head(levels(features$ORF)) # SGD gene names
 
