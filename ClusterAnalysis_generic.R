@@ -86,6 +86,7 @@ features <- featureData(ESet)
 # head(levels(features$ORF)) # SGD gene names
 
 ## Construct data frame with information needed for downstream analysis
+# PROBE_ID is now standard, but may need to use ID (or other) for older platforms
 ex.df <- data.frame(PROBE_ID = features$PROBE_ID, ORF = features$ORF, ex)
 # Only keep rows with a named ORF; removes spot controls, etc.
 ex.ORF.df <- ex.df[which(ex.df$ORF != ""),] 
@@ -94,7 +95,7 @@ ex.ORF.df <- ex.df[which(ex.df$ORF != ""),]
 ## treat duplicate spots as technical replicates
 if (anyDuplicated(ex.ORF.df$PROBE_ID) > 0) {
   # Warn if only a subset of probes are duplicated
-  if (length(ex.ORF.df)/length(levels(ex.ORF.df)) < 2) {
+  if (length(ex.ORF.df$ORF)/length(levels(ex.ORF.df$ORF)) < 2) {
     warning("Is the complete probe set duplicated?") 
   }
   dup.no = 2
